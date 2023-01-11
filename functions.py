@@ -3,6 +3,7 @@
 import requests
 import json
 import sqlite3
+from datetime import datetime
 
 def debug_print(debug: bool, string: str) -> None:
     if debug:
@@ -38,12 +39,13 @@ def get_and_sort_cryptodata(url: str, headers: str, querystring: str, data_to_st
     cryptocurrencies_saved_data = sort_cryptodata(cryptocurrencies_data, data_to_store)
     return cryptocurrencies_saved_data
 
-def fill_database(DBPath: str, cryptocurrencies_sorted_data: dict) -> None:
+def fill_database(DBPath: str, cryptocurrencies_sorted_data: dict, timestamp: float) -> None:
     for cryptocurrency in cryptocurrencies_sorted_data:
         current_crypto = cryptocurrencies_sorted_data[cryptocurrency]
         if (False == did_crypto_exists(DBPath, current_crypto['id'])):
             insert_in_table_crypto(DBPath, current_crypto['id'], current_crypto['name'], cryptocurrency)
-        insert_in_table_data(DBPath, current_crypto['id'], current_crypto['last_updated'], current_crypto['cmc_rank'], current_crypto['price'], current_crypto['market_cap'])
+        insert_in_table_data(DBPath, current_crypto['id'], timestamp, current_crypto['cmc_rank'], current_crypto['price'], current_crypto['market_cap'])
+    
 
 def open_database(DBPath: str) -> dict:
     sqlite_connnect = sqlite3.connect(DBPath)
@@ -56,7 +58,8 @@ def close_database(connect: sqlite3.connect) -> None:
 def init_database(DBPath: str) -> None:
     db = open_database(DBPath)
     db['cursor'].execute('CREATE TABLE IF NOT EXISTS cryptocurrencies (id INT PRIMARY KEY, name TEXT, symbol TEXT);')
-    db['cursor'].execute('CREATE TABLE IF NOT EXISTS data (id INT, timestamp TEXT, cmc_rank INT, price REAL, market_cap REAL);')
+    db['cursor'].execute('CREATE TABLE IF NOT EXISTS data (id INT, timestamp REAL, cmc_rank INT, price REAL, market_cap REAL);')
+    db['cursor'].execute('CREATE TABLE IF NOT EXISTS last_data (id INT, timestamp REAL, cmc_rank INT, price REAL, market_cap REAL);')
     close_database(db['connect'])
 
 def insert_in_table_crypto(DBPath: str, crypto_id: int, name: str, symbol: str) -> None:
@@ -67,7 +70,9 @@ def insert_in_table_crypto(DBPath: str, crypto_id: int, name: str, symbol: str) 
 
 def insert_in_table_data(DBPath: str, crypto_id: int, timestamp: str, cmc_rank: int, price: float, market_cap: float) -> None:
     db = open_database(DBPath)
-    db['cursor'].execute(f'INSERT INTO data VALUES ("{crypto_id}", "{timestamp}", "{cmc_rank}", "{price}", "{market_cap}");')
+    if (0 == datetime.fromtimestamp(timestamp).minute):
+        db['cursor'].execute(f'INSERT INTO data VALUES ("{crypto_id}", "{timestamp}", "{cmc_rank}", "{price}", "{market_cap}");')
+    db['cursor'].execute(f'INSERT INTO last_data VALUES ("{crypto_id}", "{timestamp}", "{cmc_rank}", "{price}", "{market_cap}");')
     db['connect'].commit()
     close_database(db['connect'])
 
