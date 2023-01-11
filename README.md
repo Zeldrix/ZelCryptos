@@ -1,1 +1,1 @@
-# ZelCryptos
+# currencies-rate
