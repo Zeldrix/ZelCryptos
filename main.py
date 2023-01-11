@@ -3,6 +3,7 @@
 import configparser
 import functions
 import json
+import time
 
 # Import des données du fichier de configuration
 config = configparser.ConfigParser()
@@ -25,10 +26,9 @@ request_headers = {"Accepts": "application/json", "X-CMC_PRO_API_KEY": API_KEY}
 dataToStore = ['id', 'name', 'cmc_rank', 'last_updated', ['quote','USD','price'], ['quote','USD','market_cap']]
 
 
+
 ########################################  DEBUT DU PROGRAMME  ########################################
 
 cryptocurrencies_saved_data = functions.get_and_sort_cryptodata(request_url, request_headers, request_querystring, dataToStore)
-
 functions.fill_database(DBPATH, cryptocurrencies_saved_data)
-
 functions.debug_print(DEBUG, json.dumps(cryptocurrencies_saved_data, indent=2))
