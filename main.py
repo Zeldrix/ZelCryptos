@@ -3,11 +3,13 @@
 import configparser
 import functions
 import json
-import time
+import os
+
+script_path = (os.path.dirname(os.path.realpath(__file__)) + os.sep)
 
 # Import des données du fichier de configuration
 config = configparser.ConfigParser()
-config.read('config/config.ini')
+config.read(script_path + 'config/config.ini')
 
 DBPATH = config['SQLite']['DBPath']
 API_KEY = config['CoinMarketCap']['API_KEY']
