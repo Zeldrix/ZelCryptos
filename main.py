@@ -29,11 +29,6 @@ dataToStore = ['id', 'name', 'cmc_rank', 'last_updated', ['quote','USD','price']
 
 cryptocurrencies_saved_data = functions.get_and_sort_cryptodata(request_url, request_headers, request_querystring, dataToStore)
 
-for cryptocurrency in cryptocurrencies_saved_data:
-    current_crypto = cryptocurrencies_saved_data[cryptocurrency]
-    if (False == functions.did_crypto_exists(DBPATH, current_crypto['id'])):
-        functions.insert_in_table_crypto(DBPATH, current_crypto['id'], current_crypto['name'], cryptocurrency)
-    functions.insert_in_table_data(DBPATH, current_crypto['id'], current_crypto['last_updated'], current_crypto['cmc_rank'], current_crypto['price'], current_crypto['market_cap'])
-
+functions.fill_database(DBPATH, cryptocurrencies_saved_data)
 
 functions.debug_print(DEBUG, json.dumps(cryptocurrencies_saved_data, indent=2))

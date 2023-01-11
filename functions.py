@@ -38,6 +38,13 @@ def get_and_sort_cryptodata(url: str, headers: str, querystring: str, data_to_st
     cryptocurrencies_saved_data = sort_cryptodata(cryptocurrencies_data, data_to_store)
     return cryptocurrencies_saved_data
 
+def fill_database(DBPath: str, cryptocurrencies_sorted_data: dict) -> None:
+    for cryptocurrency in cryptocurrencies_sorted_data:
+        current_crypto = cryptocurrencies_sorted_data[cryptocurrency]
+        if (False == did_crypto_exists(DBPath, current_crypto['id'])):
+            insert_in_table_crypto(DBPath, current_crypto['id'], current_crypto['name'], cryptocurrency)
+        insert_in_table_data(DBPath, current_crypto['id'], current_crypto['last_updated'], current_crypto['cmc_rank'], current_crypto['price'], current_crypto['market_cap'])
+
 def open_database(DBPath: str) -> dict:
     sqlite_connnect = sqlite3.connect(DBPath)
     sqlite_cursor = sqlite_connnect.cursor()
