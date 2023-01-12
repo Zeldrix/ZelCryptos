@@ -45,7 +45,7 @@ def fill_database(DBPath: str, cryptocurrencies_sorted_data: dict, timestamp: fl
         if (False == did_crypto_exists(DBPath, current_crypto['id'])):
             insert_in_table_crypto(DBPath, current_crypto['id'], current_crypto['name'], cryptocurrency)
         insert_in_table_data(DBPath, current_crypto['id'], timestamp, current_crypto['cmc_rank'], current_crypto['price'], current_crypto['market_cap'])
-    
+
 
 def open_database(DBPath: str) -> dict:
     sqlite_connnect = sqlite3.connect(DBPath)
@@ -59,7 +59,7 @@ def init_database(DBPath: str) -> None:
     db = open_database(DBPath)
     db['cursor'].execute('CREATE TABLE IF NOT EXISTS cryptocurrencies (id INT PRIMARY KEY, name TEXT, symbol TEXT);')
     db['cursor'].execute('CREATE TABLE IF NOT EXISTS data (id INT, timestamp REAL, cmc_rank INT, price REAL, market_cap REAL);')
-    db['cursor'].execute('CREATE TABLE IF NOT EXISTS last_data (id INT, timestamp REAL, cmc_rank INT, price REAL, market_cap REAL);')
+    db['cursor'].execute('CREATE TABLE IF NOT EXISTS last_data (id INT PRIMARY KEY, timestamp REAL, cmc_rank INT, price REAL, market_cap REAL);')
     close_database(db['connect'])
 
 def insert_in_table_crypto(DBPath: str, crypto_id: int, name: str, symbol: str) -> None:
@@ -72,6 +72,7 @@ def insert_in_table_data(DBPath: str, crypto_id: int, timestamp: str, cmc_rank: 
     db = open_database(DBPath)
     if (0 == datetime.fromtimestamp(timestamp).minute):
         db['cursor'].execute(f'INSERT INTO data VALUES ("{crypto_id}", "{timestamp}", "{cmc_rank}", "{price}", "{market_cap}");')
+    db['cursor'].execute(f'DELETE FROM last_data WHERE id = "{crypto_id}";') # On supprime la dernière valeur pour la crypto pour la réinsérer ensuite
     db['cursor'].execute(f'INSERT INTO last_data VALUES ("{crypto_id}", "{timestamp}", "{cmc_rank}", "{price}", "{market_cap}");')
     db['connect'].commit()
     close_database(db['connect'])

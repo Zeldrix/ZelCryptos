@@ -7,7 +7,7 @@ import functions
 import json
 
 script_folder = (os.path.dirname(os.path.realpath(__file__)) + os.sep)
-script_parent_folder = os.path.abspath(os.path.join(script_folder, os.pardir))
+script_parent_folder = (os.path.abspath(os.path.join(script_folder, os.pardir)) + os.sep)
 
 current_datetime = datetime.now().replace(second=0, microsecond=0)
 current_minute = current_datetime.minute
