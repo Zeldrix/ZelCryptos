@@ -67,6 +67,28 @@ def read_cryptos_last(token_symbol: str):
 
 
 
+@app.get("/crypto/{token_symbol}/last/price")
+def read_cryptos_last(token_symbol: str):
+    error_string = 'error'
+    try:
+        with sqlite3.connect(DBPATH, check_same_thread=False) as con:
+            cur = con.cursor()
+            try:
+                token = cur.execute(f'SELECT id, name, symbol FROM cryptocurrencies WHERE symbol = "{token_symbol.upper()}";').fetchone()
+                try:
+                    res = cur.execute(f'SELECT price FROM last_data WHERE id = "{token[0]}";').fetchone()
+                    output = res[0]
+                except:
+                    error_string
+            except:
+                output = error_string
+    except:
+        output = error_string
+
+    return output
+
+
+
 @app.get("/crypto/{token_symbol}/history")
 def read_cryptos_history(token_symbol: str, days_range: int = 7):
     timestamp = datetime.now().timestamp()
