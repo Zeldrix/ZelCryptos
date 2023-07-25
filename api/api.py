@@ -77,10 +77,7 @@ def read_cryptos_last(token_symbol: str, decimals: int = 12) -> float:
                 token = cur.execute(f'SELECT id, name, symbol FROM cryptocurrencies WHERE symbol = "{token_symbol.upper()}";').fetchone()
                 try:
                     res = cur.execute(f'SELECT price FROM last_data WHERE id = "{token[0]}";').fetchone()
-                    if (decimals == 0):
-                        output = int(round(res[0], decimals))
-                    else:
-                        output = round(res[0], decimals)
+                    output = round(res[0], decimals)
                 except:
                     error_string
             except:
