@@ -68,7 +68,7 @@ def read_cryptos_last(token_symbol: str):
 
 
 @app.get("/crypto/{token_symbol}/last/price")
-def read_cryptos_last(token_symbol: str, decimals: int = 12) -> int:
+def read_cryptos_last(token_symbol: str, decimals: int = 12) -> float:
     error_string = 'error'
     try:
         with sqlite3.connect(DBPATH, check_same_thread=False) as con:
@@ -79,11 +79,31 @@ def read_cryptos_last(token_symbol: str, decimals: int = 12) -> int:
                     res = cur.execute(f'SELECT price FROM last_data WHERE id = "{token[0]}";').fetchone()
                     output = round(res[0], decimals)
                 except:
-                    error_string
+                    output = error_string
             except:
                 output = error_string
     except:
         output = error_string
+
+    return output
+
+@app.get("/crypto/{token_symbol}/last/price/rounded")
+def read_cryptos_last(token_symbol: str) -> int:
+    error_int = 0
+    try:
+        with sqlite3.connect(DBPATH, check_same_thread=False) as con:
+            cur = con.cursor()
+            try:
+                token = cur.execute(f'SELECT id, name, symbol FROM cryptocurrencies WHERE symbol = "{token_symbol.upper()}";').fetchone()
+                try:
+                    res = cur.execute(f'SELECT price FROM last_data WHERE id = "{token[0]}";').fetchone()
+                    output = int(round(res[0], 0))
+                except:
+                    output = error_int
+            except:
+                output = error_int
+    except:
+        output = error_int
 
     return output
 
