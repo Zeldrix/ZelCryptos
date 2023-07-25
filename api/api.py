@@ -68,7 +68,7 @@ def read_cryptos_last(token_symbol: str):
 
 
 @app.get("/crypto/{token_symbol}/last/price")
-def read_cryptos_last(token_symbol: str, decimals: int = 12) -> float:
+def read_cryptos_last(token_symbol: str, decimals: int = 12) -> str:
     error_string = 'error'
     try:
         with sqlite3.connect(DBPATH, check_same_thread=False) as con:
