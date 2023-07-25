@@ -68,7 +68,7 @@ def read_cryptos_last(token_symbol: str):
 
 
 @app.get("/crypto/{token_symbol}/last/price")
-def read_cryptos_last(token_symbol: str):
+def read_cryptos_last(token_symbol: str, decimals: int = 2):
     error_string = 'error'
     try:
         with sqlite3.connect(DBPATH, check_same_thread=False) as con:
@@ -77,7 +77,7 @@ def read_cryptos_last(token_symbol: str):
                 token = cur.execute(f'SELECT id, name, symbol FROM cryptocurrencies WHERE symbol = "{token_symbol.upper()}";').fetchone()
                 try:
                     res = cur.execute(f'SELECT price FROM last_data WHERE id = "{token[0]}";').fetchone()
-                    output = res[0]
+                    output = round(res[0], decimals)
                 except:
                     error_string
             except:
